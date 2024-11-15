@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-//import { login, loginViaGg } from '../../utils/Api/AuthApi';
+import {login} from '../../services/Api/AuthApi';
 import {Link, useNavigate} from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
@@ -27,21 +27,25 @@ const Login = () => {
         alert(`${email}, ${password}, ${rememberMe}`)
         localStorage.setItem('user',JSON.stringify(credentials));
         setLoggedIn(true)
-        // try {
-        //     const data = await login(credentials);
-        //     if (data && data.accessToken) {
-        //         setLoggedIn(true);
-        //     } else {
-        //         setErrorMessage('Login was successful but no token was received.');
-        //     }
-        // } catch (error) {
-        //     const errorMsg = error.response?.data?.message || 'An error occurred during login.';
-        //     setErrorMessage(errorMsg);
-        // } finally {
-        //     setLoading(false);
-        // }
+        try {
+            console.log('start login request')
+            const data = await login(credentials);
+            console.log('data',data)
+            localStorage.setItem('data',JSON.stringify(data));
+            if (data && data.accessToken) {
+                setLoggedIn(true);
+            } else {
+                setErrorMessage('Login was successful but no token was received.');
+            }
+        } catch (error) {
+            const errorMsg = error.response?.data?.message || 'An error occurred during login.';
+            setErrorMessage(errorMsg);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    //login via gg
     const handleLoginSuccess = async (response) => {
         const decoded = jwtDecode(response.credential);
         console.log(decoded)
